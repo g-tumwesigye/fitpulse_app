@@ -77,9 +77,11 @@ flutter run
 ```
 
 Model Training
+
 The model is trained on the dataset from Kaggle (https://www.kaggle.com/datasets/mustafa20635/fitness-exercises-using-bfp-and-bmi) using Linear Regression to predict Body Fat Percentage based on the user's weight, height, BMI, Gender, and age.
 
 Usage
+
 Input data (weight, height, BMI, age, gender) in the Flutter app.
 Get the predicted Body Fat Percentage from the FastAPI backend.
 
