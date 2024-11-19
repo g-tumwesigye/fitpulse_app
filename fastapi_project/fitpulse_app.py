@@ -3,23 +3,23 @@ from pydantic import BaseModel, field_validator
 import joblib
 import pandas as pd
 
-# Initialize FastAPI application
+# Initializing the FastAPI application
 app = FastAPI(title="Fitpulse Body Fat Prediction API", version="1.0.0")
 
-# Load the trained model and scaler from disk
-model = joblib.load("best_model.pkl")  # Ensure the model file is correct
-scaler = joblib.load("scaler.pkl")    # Ensure the scaler used for training is also loaded
+# Here I am loading the model and scaler
+model = joblib.load("best_model.pkl")  
+scaler = joblib.load("scaler.pkl")   
 
-# List of feature names expected by the model
+# Feature names &the order
 FEATURE_ORDER = ["Weight", "Height", "BMI", "Gender", "Age"]
 # Mapping for gender as the model was trained with numeric encoding
 GENDER_MAPPING = {"Male": 1, "Female": 0}
 
-# Define the structure of the input data using Pydantic
+# Defining the structure of the input data using Pydantic
 class InputData(BaseModel):
     Weight: float  # User's weight (kg)
     Height: float  # User's height (cm)
-    BMI: float     # User's BMI (calculated from weight and height)
+    BMI: float     # User's BMI 
     Gender: str    # User's gender ('Male' or 'Female')
     Age: int       # User's age in years
 
@@ -27,15 +27,13 @@ class InputData(BaseModel):
     @field_validator("Weight", "Height", "BMI", "Age")
     def validate_positive(cls, value):
         if value <= 0:
-            raise ValueError("All values must be greater than zero.")  # Ensure all inputs are positive
-        return value
+            raise ValueError("All values must be greater than zero.")  
 
     # Validator for gender to ensure it matches the expected values
     @field_validator("Gender")
     def validate_gender(cls, value):
         if value not in GENDER_MAPPING:
-            raise ValueError("Gender must be either 'Male' or 'Female'.")  # Validate gender input
-        return value
+            raise ValueError("Gender must be either 'Male' or 'Female'.") 
 
 # Root endpoint to test if the API is running
 @app.get("/")
@@ -46,7 +44,7 @@ def home():
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        # Convert the input data to a pandas DataFrame for processing
+        # Convreting the input data to a pandas DataFrame for processing
         input_df = pd.DataFrame([{
             "Weight": data.Weight,
             "Height": data.Height,
@@ -55,7 +53,7 @@ def predict(data: InputData):
             "Age": data.Age,
         }])
 
-        # Scale the input data using the same scaler used during training
+        # Scaling the input data using the same scaler used during training
         scaled_input = scaler.transform(input_df)
 
         # Predict Body Fat Percentage using the trained model
@@ -68,7 +66,7 @@ def predict(data: InputData):
         # Handle any errors during prediction and return a 500 error
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
-# Ensure the app runs on all interfaces for access from other devices
+# The app runs on all interfaces for access from other devices
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
