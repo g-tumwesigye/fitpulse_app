@@ -4,16 +4,31 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Load the trained Random Forest model and scaler
 random_forest = joblib.load('best_model.pkl')
 scaler = joblib.load('scaler.pkl')
 
+# Load the feature names from the training process
+X = pd.DataFrame(columns=['Weight', 'Height', 'BMI', 'Gender', 'Age', 'BFPcase', 'BMIcase', 'Exercise Recommendation Plan'])
+
 # Initialize FastAPI app
-app = FastAPI(title="FitPulse Prediction API",
-              description="An API to predict Body Fat Percentage using a trained Random Forest model.",
-              version="1.0.0")
+app = FastAPI(
+    title="FitPulse Prediction API",
+    description="An API to predict Body Fat Percentage using a trained Random Forest model.",
+    version="1.0.0"
+)
+
+# Add CORS middleware to handle cross-origin requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this in production to specific domains
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Define input schema for FastAPI
 class PredictionInput(BaseModel):
@@ -36,36 +51,11 @@ class PredictionInput(BaseModel):
         if not (0 <= self.age <= 120):
             raise HTTPException(status_code=400, detail="Age must be between 0 and 120 years.")
 
-# Function to get user input (for command-line interface)
-def get_user_input():
-    # Prompting the user for inputs 
-    weight = float(input("Enter your weight (kg): "))
-    if not (2.5 <= weight <= 300):
-        raise ValueError("Weight must be between 2.5 and 300 kg.")
-    
-    height = float(input("Enter your height (m): "))
-    if not (0.5 <= height <= 2.5):
-        raise ValueError("Height must be between 0.5 and 2.5 meters.")
-    
-    bmi = float(input("Enter your BMI: "))
-    if not (10 <= bmi <= 60):
-        raise ValueError("BMI must be between 10 and 60.")
-    
-    gender = input("Enter your gender (Male/Female): ").capitalize()
-    if gender not in ['Male', 'Female']:
-        raise ValueError("Please enter a valid gender (Male/Female).")
-    
-    age = int(input("Enter your age: "))
-    if not (0 <= age <= 120):
-        raise ValueError("Age must be between 0 and 120 years.")
-
-    return weight, height, bmi, gender, age
-
 # Function to predict Body Fat Percentage
 def predict_body_fat(weight, height, bmi, gender, age):
     # Map gender to numerical values
     gender_map = {'Male': 1, 'Female': 0}
-    gender_encoded = gender_map.get(gender, -1)
+    gender_encoded = gender_map.get(gender.capitalize(), -1)
 
     if gender_encoded == -1:
         raise ValueError("Invalid gender input. Please enter 'Male' or 'Female'.")
@@ -82,6 +72,7 @@ def predict_body_fat(weight, height, bmi, gender, age):
         'Exercise Recommendation Plan': [0]  
     })
 
+    # Align the input data with model features
     input_data = input_data[X.columns]
 
     # Scale the input data
@@ -116,6 +107,30 @@ def api_predict(data: PredictionInput):
 
 # CLI prediction logic (to remain intact)
 if __name__ == "__main__":
+    def get_user_input():
+        # Prompting the user for inputs 
+        weight = float(input("Enter your weight (kg): "))
+        if not (2.5 <= weight <= 300):
+            raise ValueError("Weight must be between 2.5 and 300 kg.")
+        
+        height = float(input("Enter your height (m): "))
+        if not (0.5 <= height <= 2.5):
+            raise ValueError("Height must be between 0.5 and 2.5 meters.")
+        
+        bmi = float(input("Enter your BMI: "))
+        if not (10 <= bmi <= 60):
+            raise ValueError("BMI must be between 10 and 60.")
+        
+        gender = input("Enter your gender (Male/Female): ").capitalize()
+        if gender not in ['Male', 'Female']:
+            raise ValueError("Please enter a valid gender (Male/Female).")
+        
+        age = int(input("Enter your age: "))
+        if not (0 <= age <= 120):
+            raise ValueError("Age must be between 0 and 120 years.")
+
+        return weight, height, bmi, gender, age
+
     weight, height, bmi, gender, age = get_user_input()
     predicted_bfp = predict_body_fat(weight, height, bmi, gender, age)
     print(f"Predicted Body Fat Percentage: {predicted_bfp}")
