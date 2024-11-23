@@ -3,9 +3,12 @@ from pydantic import BaseModel
 import pandas as pd
 import joblib
 
+
 # Load the trained model and scaler
 random_forest = joblib.load("best_model.pkl")
 scaler = joblib.load("scaler.pkl")
+except Exception as e:
+    print(f"Error loading model or scaler: {e}")
 
 # Initialize FastAPI app
 app = FastAPI()
