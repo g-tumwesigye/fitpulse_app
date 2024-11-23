@@ -1,79 +1,122 @@
+# Required imports
+import joblib
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import pandas as pd
-import joblib
 
-
-# Load the trained model and scaler
-random_forest = joblib.load("best_model.pkl")
-scaler = joblib.load("scaler.pkl")
-except Exception as e:
-    print(f"Error loading model or scaler: {e}")
+# Load the trained Random Forest model and scaler
+random_forest = joblib.load('best_model.pkl')
+scaler = joblib.load('scaler.pkl')
 
 # Initialize FastAPI app
-app = FastAPI()
+app = FastAPI(title="FitPulse Prediction API",
+              description="An API to predict Body Fat Percentage using a trained Random Forest model.",
+              version="1.0.0")
 
-# Define the Pydantic model for input validation
-class UserInput(BaseModel):
+# Define input schema for FastAPI
+class PredictionInput(BaseModel):
     weight: float
     height: float
     bmi: float
     gender: str
     age: int
 
-# Function to validate input range
-def validate_input(weight, height, bmi, gender, age):
-    if not (2.5 <= weight <= 300):
-        raise HTTPException(status_code=400, detail="Weight must be between 2.5 and 300 kg.")
-    if not (0.5 <= height <= 2.5):
-        raise HTTPException(status_code=400, detail="Height must be between 0.5 and 2.5 meters.")
-    if not (10 <= bmi <= 60):
-        raise HTTPException(status_code=400, detail="BMI must be between 10 and 60.")
-    if gender not in ['Male', 'Female']:
-        raise HTTPException(status_code=400, detail="Gender must be 'Male' or 'Female'.")
-    if not (0 <= age <= 120):
-        raise HTTPException(status_code=400, detail="Age must be between 0 and 120 years.")
+    # Validation logic
+    def validate(self):
+        if not (2.5 <= self.weight <= 300):
+            raise HTTPException(status_code=400, detail="Weight must be between 2.5 and 300 kg.")
+        if not (0.5 <= self.height <= 2.5):
+            raise HTTPException(status_code=400, detail="Height must be between 0.5 and 2.5 meters.")
+        if not (10 <= self.bmi <= 60):
+            raise HTTPException(status_code=400, detail="BMI must be between 10 and 60.")
+        if self.gender.capitalize() not in ['Male', 'Female']:
+            raise HTTPException(status_code=400, detail="Gender must be 'Male' or 'Female'.")
+        if not (0 <= self.age <= 120):
+            raise HTTPException(status_code=400, detail="Age must be between 0 and 120 years.")
 
-# Define the prediction function
+# Function to get user input (for command-line interface)
+def get_user_input():
+    # Prompting the user for inputs 
+    weight = float(input("Enter your weight (kg): "))
+    if not (2.5 <= weight <= 300):
+        raise ValueError("Weight must be between 2.5 and 300 kg.")
+    
+    height = float(input("Enter your height (m): "))
+    if not (0.5 <= height <= 2.5):
+        raise ValueError("Height must be between 0.5 and 2.5 meters.")
+    
+    bmi = float(input("Enter your BMI: "))
+    if not (10 <= bmi <= 60):
+        raise ValueError("BMI must be between 10 and 60.")
+    
+    gender = input("Enter your gender (Male/Female): ").capitalize()
+    if gender not in ['Male', 'Female']:
+        raise ValueError("Please enter a valid gender (Male/Female).")
+    
+    age = int(input("Enter your age: "))
+    if not (0 <= age <= 120):
+        raise ValueError("Age must be between 0 and 120 years.")
+
+    return weight, height, bmi, gender, age
+
+# Function to predict Body Fat Percentage
 def predict_body_fat(weight, height, bmi, gender, age):
-    # Defining the mappings for Gender
+    # Map gender to numerical values
     gender_map = {'Male': 1, 'Female': 0}
     gender_encoded = gender_map.get(gender, -1)
+
     if gender_encoded == -1:
         raise ValueError("Invalid gender input. Please enter 'Male' or 'Female'.")
 
-    # Create a DataFrame with the same structure as the model training data
+    # Create a DataFrame with the input data
     input_data = pd.DataFrame({
         'Weight': [weight],
         'Height': [height],
         'BMI': [bmi],
         'Gender': [gender_encoded],
         'Age': [age],
-        'BFPcase': [0],  # Placeholder
-        'BMIcase': [0],  # Placeholder
-        'Exercise Recommendation Plan': [0]  # Placeholder
+        'BFPcase': [0],  
+        'BMIcase': [0],  
+        'Exercise Recommendation Plan': [0]  
     })
 
-    # Ensure the input columns match the model's expected features
-    input_data = input_data[['Weight', 'Height', 'BMI', 'Gender', 'Age', 'BFPcase', 'BMIcase', 'Exercise Recommendation Plan']]
+    input_data = input_data[X.columns]
 
-    # Standardize the input features
+    # Scale the input data
     input_scaled = scaler.transform(input_data)
 
-    # Predict using the Random Forest model
+    # Predict Body Fat Percentage
     predicted_bfp = random_forest.predict(input_scaled)
 
     return predicted_bfp[0]
 
-# Define the POST endpoint to receive user input and make predictions
+# FastAPI root endpoint
+@app.get("/")
+def root():
+    return {"message": "Welcome to the FitPulse Prediction API. Use the /predict endpoint to make predictions."}
+
+# FastAPI prediction endpoint
 @app.post("/predict")
-def get_prediction(user_input: UserInput):
-    # Validate input values
-    validate_input(user_input.weight, user_input.height, user_input.bmi, user_input.gender, user_input.age)
+def api_predict(data: PredictionInput):
+    # Validate input data
+    data.validate()
 
-    # Make the prediction
-    predicted_bfp = predict_body_fat(user_input.weight, user_input.height, user_input.bmi, user_input.gender, user_input.age)
+    # Make prediction
+    predicted_bfp = predict_body_fat(
+        weight=data.weight,
+        height=data.height,
+        bmi=data.bmi,
+        gender=data.gender,
+        age=data.age
+    )
 
-    return {"predicted_bfp": predicted_bfp}
+    return {"Predicted Body Fat Percentage": predicted_bfp}
 
+# CLI prediction logic (to remain intact)
+if __name__ == "__main__":
+    weight, height, bmi, gender, age = get_user_input()
+    predicted_bfp = predict_body_fat(weight, height, bmi, gender, age)
+    print(f"Predicted Body Fat Percentage: {predicted_bfp}")
 
