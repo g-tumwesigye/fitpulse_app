@@ -101,7 +101,7 @@ The design for the FitPulse App's user interface was created in Figma.
 ---
 
 ## Video Demo  
-- [YouTube Video Demo](#)  
+- [YouTube Video Demo](https://www.youtube.com/watch?v=pzYvPcJ2xVY)  
   - The video demonstrates:  
     1. **Swagger UI**: Testing API predictions.  
     2. **Flutter App**: Feeding inputs, predicting Body Fat Percentage and displaying results.  
