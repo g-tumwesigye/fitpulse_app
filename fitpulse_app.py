@@ -12,7 +12,7 @@ random_forest = joblib.load('best_model.pkl')
 scaler = joblib.load('scaler.pkl')
 
 # Load the feature names from the training process
-X = pd.DataFrame(columns=['Weight', 'Height', 'BMI', 'Gender', 'Age', 'BFPcase', 'BMIcase', 'Exercise Recommendation Plan'])
+X = pd.DataFrame(columns=['Weight', 'Height', 'BMI', 'Gender', 'Age'])
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -66,14 +66,11 @@ def predict_body_fat(weight, height, bmi, gender, age):
         'Height': [height],
         'BMI': [bmi],
         'Gender': [gender_encoded],
-        'Age': [age],
-        'BFPcase': [0],  
-        'BMIcase': [0],  
-        'Exercise Recommendation Plan': [0]  
+        'Age': [age]
     })
 
     # Align the input data with model features
-    input_data = input_data[X.columns]
+    # input_data = input_data[X.columns]
 
     # Scale the input data
     input_scaled = scaler.transform(input_data)
