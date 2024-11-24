@@ -30,15 +30,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define input schema for FastAPI
+# Defining the input schema for the FastAPI
 class PredictionInput(BaseModel):
-    weight: float
-    height: float
-    bmi: float
-    gender: str
-    age: int
+    weight: float = Field(..., alias="Weight")
+    height: float = Field(..., alias="Height")
+    bmi: float = Field(..., alias="BMI")
+    gender: str = Field(..., alias="Gender")
+    age: int = Field(..., alias="Age")
 
-    # Validation logic
+    # Validating
     def validate(self):
         if not (2.5 <= self.weight <= 300):
             raise HTTPException(status_code=400, detail="Weight must be between 2.5 and 300 kg.")
