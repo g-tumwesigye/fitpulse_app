@@ -91,19 +91,24 @@ def root():
 # FastAPI prediction endpoint
 @app.post("/predict")
 def api_predict(data: PredictionInput):
-    # Validate input data
-    data.validate()
 
-    # Make prediction
-    predicted_bfp = predict_body_fat(
-        weight=data.weight,
-        height=data.height,
-        bmi=data.bmi,
-        gender=data.gender,
-        age=data.age
-    )
+    try:
+        # Validate input data
+        data.validate()
 
-    return {"Predicted Body Fat Percentage": predicted_bfp}
+        # Make prediction
+        predicted_bfp = predict_body_fat(
+            weight=data.weight,
+            height=data.height,
+            bmi=data.bmi,
+            gender=data.gender,
+            age=data.age
+        )
+
+        return {"Predicted Body Fat Percentage": predicted_bfp}
+    
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
 
 # CLI prediction logic (to remain intact)
 if __name__ == "__main__":
