@@ -108,7 +108,7 @@ def api_predict(data: PredictionInput):
         return {"Predicted Body Fat Percentage": predicted_bfp}
     
     except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
+        return {"error": f"Unexpected {err=}, {type(err)=}"}
 
 # CLI prediction logic (to remain intact)
 if __name__ == "__main__":
