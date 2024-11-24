@@ -92,6 +92,14 @@ The Flutter mobile app interacts with the FastAPI endpoint to make predictions.
 
 ---
 
+
+## Figma Design  
+The design for the FitPulse App's user interface was created in Figma. 
+
+[Figma Design for FitPulse App](https://www.figma.com/design/b6unAKFAvl92AXWiwlsZBB/FITPULSE_APP?node-id=0-1&node-type=canvas&t=lQLLBIpmwXGiCiF9-0)
+
+---
+
 ## Video Demo  
 - [YouTube Video Demo](#)  
   - The video demonstrates:  

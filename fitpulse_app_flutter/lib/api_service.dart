@@ -5,7 +5,7 @@ class ApiService {
   static const String baseUrl = "https://fitpulse-app.onrender.com";
 
   // Fetching predictions for the Body Fat Percentage based on user input
-  static Future<Map<String, dynamic>> predictBodyFat({
+  static Future<double> predictBodyFat({
     required double weight,
     required double height,
     required double bmi,
@@ -29,9 +29,14 @@ class ApiService {
 
     // Handling response from the server
     if (response.statusCode == 200) {
-      return jsonDecode(response.body); // Return the prediction result
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (responseData.containsKey("Predicted Body Fat Percentage")) {
+        return responseData["Predicted Body Fat Percentage"];
+      } else {
+        throw Exception("Invalid response format: Missing 'Predicted Body Fat Percentage'.");
+      }
     } else {
-      throw Exception("Failed to fetch prediction: ${response.body}"); // error handling
+      throw Exception("Failed to fetch prediction: ${response.body}");
     }
   }
 }

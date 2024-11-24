@@ -16,13 +16,40 @@ class _InputFieldPageState extends State<InputFieldPage> {
 
   void _getPrediction() async {
     try {
+      // Validate user input
+      if (_weightController.text.isEmpty ||
+          _heightController.text.isEmpty ||
+          _bmiController.text.isEmpty ||
+          _ageController.text.isEmpty ||
+          _genderController.text.isEmpty) {
+        setState(() {
+          _result = "Error: All fields are required!";
+        });
+        return;
+      }
+
       final weight = double.parse(_weightController.text);
       final height = double.parse(_heightController.text);
       final bmi = double.parse(_bmiController.text);
       final age = int.parse(_ageController.text);
-      final gender = _genderController.text;
+      final gender = _genderController.text.trim().toLowerCase();
 
-      final response = await ApiService.predictBodyFat(
+      // Validate gender input
+      if (gender != "male" && gender != "female") {
+        setState(() {
+          _result = "Error: Gender must be 'Male' or 'Female'.";
+        });
+        return;
+      }
+
+
+      // final weight = double.parse(_weightController.text);
+      // final height = double.parse(_heightController.text);
+      // final bmi = double.parse(_bmiController.text);
+      // final age = int.parse(_ageController.text);
+      // final gender = _genderController.text;
+
+      final predictedBFP = await ApiService.predictBodyFat(
         weight: weight,
         height: height,
         bmi: bmi,
@@ -31,7 +58,7 @@ class _InputFieldPageState extends State<InputFieldPage> {
       );
 
       setState(() {
-        _result = "Body Fat Percentage: ${response['Body Fat Percentage']}%";
+        _result = "Body Fat Percentage: ${predictedBFP.toStringAsFixed(2)}%";
       });
     } catch (e) {
       setState(() {
