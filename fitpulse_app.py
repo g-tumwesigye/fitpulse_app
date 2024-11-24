@@ -135,5 +135,5 @@ if __name__ == "__main__":
 
     weight, height, bmi, gender, age = get_user_input()
     predicted_bfp = predict_body_fat(weight, height, bmi, gender, age)
-    print(f"Predicted Body Fat Percentage: {predicted_bfp}")
+    print(f"Predicted Body Fat Percentage: {predicted_bfp:.2f}")
 
