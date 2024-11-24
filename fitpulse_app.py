@@ -106,7 +106,7 @@ def api_predict(data: PredictionInput):
 # Rounding the results to 2 decimal places
         rounded_bfp = round(predicted_bfp, 2)
 
-        return {"Predicted Body Fat Percentage": predicted_bfp}
+        return {"Predicted Body Fat Percentage": rounded_bfp}
     
     except Exception as err:
         return {"error": f"Unexpected {err=}, {type(err)=}"}
