@@ -1,47 +1,106 @@
 # FitPulse App
 
-FitPulse App predicts Body Fat Percentage using a trained Linear regression model. This App helps users track their fitness levels by providing predictions based on their personal details such as weight, height, age, BMI, and gender. The application is built using Flutter for the frontend and FastAPI for the backend, integrating machine learning for the prediction.
 
 ## Table of Contents
-1. [Introduction](#1-introduction)
-2. [Features](#2-features)
-3. [Tech Stack](#3-tech-stack)
-4. [Installation](#4-installation)
-5. [Model Training](#5-model-training)
-6. [API (FastAPI)](#6-api-fastapi)
-7. [Usage](#7-usage)
-8. [Conclusion](#8-conclusion)
+1. [Introduction](#introduction)  
+2. [Problem Statement](#problem-statement)
+3. [Features](#features)   
+4. [Tech Stack](#tech-stack)
+5. [Model Development](#model-development)  
+6. [API Details](#api-details)  
+7. [Flutter App](#flutter-app)  
+8. [Video Demo](#video-demo)  
+9. [Setup Instructions](#setup-instructions)  
+10. [Acknowledgements](#acknowledgements)
 
-## 1. Introduction
 
-The **FitPulse App** is a mobile application designed to predict Body Fat Percentage (BFP) based on various factors like weight, height, BMI, age, and gender. The model is trained using a dataset and implemented through machine learning techniques using  linear regression). The app interacts with an API built using FastAPI, which serves the trained model for prediction requests.
+---
+
+## Introduction  
+The **FitPulse App** is a predictive mobile application that predicts **Body Fat Percentage (BFP)** using user-provided inputs of **Weight, Height, BMI, Gender and Age**. The application was built using Flutter for the frontend (a user-friendly mobile application) and FastAPI for the backend. The prediction model was built using the **Random Forest Model** trained using dataset from Kaggle (https://www.kaggle.com/datasets/mustafa20635/fitness-exercises-using-bfp-and-bmi) and implemented through machine learning techniques. The app interacts with an API built using FastAPI which serves the trained model for prediction requests.
+
 
 ### Problem Statement:
-Track and predict the body fat percentage for individuals based on their personal information. This can help users better understand their health and make informed decisions on how to improve.
+Track and predict the body fat percentage of individuals based on their personal information (Weight, Height, BMI, Age & Gender). This can help users better understand their health and make informed decisions on how to improve.
 
 ---
 
-## 2. Features
-
-- **Linear Regression Model**: Predicts Body Fat Percentage based on user input.
-- **Flutter Mobile App**: User-friendly app to input data and receive predictions.
-- **FastAPI Backend**: Provides a robust and fast API for making predictions.
-- **Real-Time Predictions**: Predict body fat percentage instantly using the trained model.
+## Features  
+- **Machine Learning**: A Random Forest model for predicting Body Fat Percentage based on usr in put.
+- **API**: FastAPI for the backend with public access via Render.  
+- **Flutter Mobile App**:  User-friendly app to input data and receive predictions. 
+- **Real-Time Predictions**: Predict body fat percentage instantly using the trained model. 
 
 ---
 
-## 3. Tech Stack
+
+## Tech Stack
 
 - **Machine Learning**: Python, Scikit-Learn
 - **Backend**: FastAPI, Uvicorn
 - **Frontend**: Flutter
-- **Database**: None (Data handled via API)
 - **Model Deployment**: The model is deployed via FastAPI backend, which communicates with the Flutter app.
 - **Version Control**: Git, GitHub
 
 ---
 
-## 4. Installation
+## Model Development  
+The project compared three machine learning models:  
+1. **Linear Regression**  
+2. **Decision Trees**  
+3. **Random Forest**  
+
+**Final Model**:  
+- The **Random Forest model** was selected for deployment due to its superior performance.  
+- Model artifacts:  
+  - `best_model.pkl`: The trained model.  
+  - `scaler.pkl`: StandardScaler used to normalize inputs.  
+
+---
+
+## API Details  
+The FastAPI application allows for seamless predictions.  
+
+### **Public Endpoint**:  
+- URL: [https://fitpulse-app.onrender.com/]  
+
+**POST Endpoint**:  
+   - **Path**: `https://fitpulse-app.onrender.com/docs#/default/api_predict_predict_post`  
+   - **Inputs**:  
+     - `weight` 
+     - `height`  
+     - `bmi` 
+     - `gender`  
+     - `age`   
+   - **Output**: Predicted Body Fat Percentage or an error message if input constraints are violated.  
+**CORS Middleware**: Enables cross-origin requests.  
+**Swagger UI**: API documentation available at `https://fitpulse-app.onrender.com/docs`.  
+
+---
+
+## Flutter App  
+The Flutter mobile app interacts with the FastAPI endpoint to make predictions.  
+
+### **Key Features**:  
+- Input fields for **Weight, Height, BMI, Gender and Age**.  
+- A "Predict" button for triggering predictions.  
+- Display area for showing prediction results or error messages.  
+
+### **UI Layout**:  
+- Text fields are aligned cleanly for easy data input.  
+- Results are prominently displayed in the app interface.  
+
+---
+
+## Video Demo  
+- [YouTube Video Demo](#)  
+  - The video demonstrates:  
+    1. **Swagger UI**: Testing API predictions.  
+    2. **Flutter App**: Feeding inputs, predicting Body Fat Percentage and displaying results.  
+
+---
+
+## Setup Instructions
 
 Follow the instructions below to set up the **FitPulse App** locally.
 
@@ -76,12 +135,8 @@ Frontend Set Up (Flutter App)
 flutter run
 ```
 
-Model Training
 
-The model is trained on the dataset from Kaggle (https://www.kaggle.com/datasets/mustafa20635/fitness-exercises-using-bfp-and-bmi) using Linear Regression to predict Body Fat Percentage based on the user's weight, height, BMI, Gender, and age.
+### Acknowledgements
+Dataset: The dataset used to train the model was sourced from Kaggle (https://www.kaggle.com/datasets/mustafa20635/fitness-exercises-using-bfp-and-bmi).
 
-Usage
-
-Input data (weight, height, BMI, age, gender) in the Flutter app.
-Get the predicted Body Fat Percentage from the FastAPI backend.
 
