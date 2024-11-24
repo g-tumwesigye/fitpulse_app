@@ -5,7 +5,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 
 # Load the trained Random Forest model and scaler
 random_forest = joblib.load('best_model.pkl')
